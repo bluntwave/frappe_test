@@ -1,0 +1,11 @@
+on:
+  push:
+    branches: 
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - id: t1
+        run: ls -la
