@@ -78,7 +78,7 @@ services:
         done;
         echo "common_site_config.json found";
         
-        bench new-site lms.localhost --verbose --force --db-type mariadb --mariadb-root-password asdad123hkk23hl1gl3kjg13lajsdkbjbl --admin-password admin --install-app lms --set-default --no-mariadb-socket;
+        bench new-site lms.localhost --verbose --db-type mariadb --mariadb-root-password asdad123hkk23hl1gl3kjg13lajsdkbjbl --admin-password admin --install-app lms --set-default --no-mariadb-socket;
         bench --site lms.localhost set-config developer_mode 1;
         bench --site lms.localhost clear-cache;
         bench --site lms.localhost set-config mute_emails 1;

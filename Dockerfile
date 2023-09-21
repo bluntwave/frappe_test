@@ -110,6 +110,8 @@ RUN export APP_INSTALL_ARGS="" && \
     export APP_INSTALL_ARGS="--apps_path=/opt/frappe/apps.json"; \
   fi && \
   bench init ${APP_INSTALL_ARGS}\
+    --frappe-branch=${FRAPPE_BRANCH} \
+    --frappe-path=${FRAPPE_PATH} \
     --no-procfile \
     --no-backups \
     --skip-redis-config-generation \
