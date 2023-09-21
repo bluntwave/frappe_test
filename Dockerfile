@@ -89,13 +89,12 @@ RUN apt-get update \
     rlwrap \
     tk8.6-dev \
     cron \
+    supervisor \
     # For pandas
     gcc \
     build-essential \
     libbz2-dev \
     && rm -rf /var/lib/apt/lists/* \
-    && apt-get update -y \
-    && apt-get install supervisor -y 
 # apps.json includes
 ARG APPS_JSON_BASE64
 RUN if [ -n "${APPS_JSON_BASE64}" ]; then \
@@ -111,16 +110,14 @@ RUN export APP_INSTALL_ARGS="" && \
     export APP_INSTALL_ARGS="--apps_path=/opt/frappe/apps.json"; \
   fi && \
   bench init ${APP_INSTALL_ARGS}\
-    --frappe-branch=${FRAPPE_BRANCH} \
-    --frappe-path=${FRAPPE_PATH} \
     --no-procfile \
     --no-backups \
     --skip-redis-config-generation \
     --verbose \
+    --ignore-exist \
     /home/frappe/frappe-bench && \
   cd /home/frappe/frappe-bench && \
-  echo "{}" > sites/common_site_config.json && \
-  find apps -mindepth 1 -path "*/.git" | xargs rm -fr
+  echo "{}" > sites/common_site_config.json
 
 FROM base as backend
 

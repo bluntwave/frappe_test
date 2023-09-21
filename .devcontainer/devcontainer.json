@@ -13,6 +13,7 @@
   },
   "dockerComposeFile": "compose.yaml",
   "service": "frontend",
+  "postCreateCommand": "",
   "workspaceFolder": "/home/frappe/frappe-bench",
   "shutdownAction": "stopCompose",
   "extensions": [
