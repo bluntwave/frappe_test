@@ -60,12 +60,17 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_PASS }}
 
-    - name: Extract metadata for the Docker image
+    - name: Docker meta
       id: meta
-      uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+      uses: docker/metadata-action@v5
       with:
-        images: bluntwaves/androidsprint
-
+        # list of Docker images to use as base name for tags
+        images: |
+          bluntwaves/androisprint          
+        # generate Docker tags based on the following events/attributes
+        tags: |
+          type=semver,pattern={{major}}.{{minor}}   
+    
     - name: Build and push the Docker image
       uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
       with:
