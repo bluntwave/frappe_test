@@ -33,11 +33,11 @@ services:
         bench set-config -gp socketio_port $$SOCKETIO_PORT;
         bench setup supervisor --skip-redis;
     environment:
-      DB_HOST: dev.androidsprint.ru
+      DB_HOST: db
       DB_PORT: 3306
-      REDIS_CACHE: dev.androidsprint.ru:6400
-      REDIS_QUEUE: dev.androidsprint.ru:6401
-      REDIS_SOCKETIO: dev.androidsprint.ru:6402
+      REDIS_CACHE: redis-cache:6379
+      REDIS_QUEUE: redis-queue:6379
+      REDIS_SOCKETIO: redis-socketio:6379
       SOCKETIO_PORT: "9000"
     volumes:
       - sites:/home/frappe/frappe-bench/sites
@@ -53,6 +53,7 @@ services:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
     depends_on:
+      - db
       - configurator
       - frontend
     entrypoint:
@@ -60,10 +61,10 @@ services:
       - -c
     command:
       - >
-        wait-for-it -t 120 dev.androidsprint.ru:3306;
-        wait-for-it -t 120 dev.androidsprint.ru:6400;
-        wait-for-it -t 120 dev.androidsprint.ru:6401;
-        wait-for-it -t 120 dev.androidsprint.ru:6402;
+        wait-for-it -t 120 db:3306;
+        wait-for-it -t 120 redis-queue:6379;
+        wait-for-it -t 120 redis-cache:6379;
+        wait-for-it -t 120 redis-socketio:6379;
         export start=`date +%s`;
         until [[ -n `grep -hs ^ common_site_config.json | jq -r ".db_host // empty"` ]] && \
           [[ -n `grep -hs ^ common_site_config.json | jq -r ".redis_cache // empty"` ]] && \
@@ -77,8 +78,7 @@ services:
           fi
         done;
         echo "common_site_config.json found";
-        
-        bench new-site lms.localhost --verbose --db-type mariadb --mariadb-root-password asdad123hkk23hl1gl3kjg13lajsdkbjbl --admin-password admin --install-app lms --set-default --no-mariadb-socket;
+        bench new-site lms.localhost --force --verbose --db-type mariadb --mariadb-root-password 123 --admin-password admin --install-app lms --set-default --no-mariadb-socket;
         bench --site lms.localhost set-config developer_mode 1;
         bench --site lms.localhost clear-cache;
         bench --site lms.localhost set-config mute_emails 1;
@@ -99,6 +99,26 @@ services:
   #     - pdb-data:/var/lib/postgresql/data
   #   ports:
   #     - 3306:3306
+
+  db:
+    image: mariadb:10.6
+    healthcheck:
+      test: mysqladmin ping -h localhost --password=123
+      interval: 1s
+      retries: 15
+    command:
+      - --max-allowed-packet=67108864
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+      - --skip-innodb-read-only-compressed # Temporary fix for MariaDB 10.6
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+
+    ports:
+      - 3306:3306
+    volumes:
+      - db-data-2:/var/lib/mysql
 
 
   frontend:
@@ -123,78 +143,78 @@ services:
     ports:
       - "8080:8080"
 
-  # queue-default:
-  #   image: androidsprint:latest
-  #   depends_on:
-  #     - configurator
-  #   deploy:
-  #     restart_policy:
-  #       condition: on-failure
-  #   command:
-  #     - bench
-  #     - worker
-  #     - --queue
-  #     - default
-  #   volumes:
-  #     - sites:/home/frappe/frappe-bench/sites
-  #     - logs:/home/frappe/frappe-bench/logs
+  queue-default:
+    image: androidsprint:latest
+    depends_on:
+      - configurator
+    deploy:
+      restart_policy:
+        condition: on-failure
+    command:
+      - bench
+      - worker
+      - --queue
+      - default
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
 
-  # queue-long:
-  #   image: androidsprint:latest
+  queue-long:
+    image: androidsprint:latest
     
-  #   deploy:
-  #     restart_policy:
-  #       condition: on-failure
-  #   command:
-  #     - bench
-  #     - worker
-  #     - --queue
-  #     - long
-  #   volumes:
-  #     - sites:/home/frappe/frappe-bench/sites
-  #     - logs:/home/frappe/frappe-bench/logs
+    deploy:
+      restart_policy:
+        condition: on-failure
+    command:
+      - bench
+      - worker
+      - --queue
+      - long
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
 
-  # queue-short:
-  #   image: androidsprint:latest
+  queue-short:
+    image: androidsprint:latest
     
-  #   deploy:
-  #     restart_policy:
-  #       condition: on-failure
-  #   command:
-  #     - bench
-  #     - worker
-  #     - --queue
-  #     - short
-  #   volumes:
-  #     - sites:/home/frappe/frappe-bench/sites
-  #     - logs:/home/frappe/frappe-bench/logs
+    deploy:
+      restart_policy:
+        condition: on-failure
+    command:
+      - bench
+      - worker
+      - --queue
+      - short
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
 
-  # redis-queue:
-  #   image: redis:6.2-alpine
+  redis-queue:
+    image: redis:6.2-alpine
     
-  #   deploy:
-  #     restart_policy:
-  #       condition: on-failure
-  #   volumes:
-  #     - redis-queue-data:/data
+    deploy:
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - redis-queue-data:/data
 
-  # redis-cache:
-  #   image: redis:6.2-alpine
+  redis-cache:
+    image: redis:6.2-alpine
     
-  #   deploy:
-  #     restart_policy:
-  #       condition: on-failure
-  #   volumes:
-  #     - redis-cache-data:/data
+    deploy:
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - redis-cache-data:/data
 
-  # redis-socketio:
-  #   image: redis:6.2-alpine
+  redis-socketio:
+    image: redis:6.2-alpine
     
-  #   deploy:
-  #     restart_policy:
-  #       condition: on-failure
-  #   volumes:
-  #     - redis-socketio-data:/data
+    deploy:
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - redis-socketio-data:/data
 
   scheduler:
     image: androidsprint:latest
@@ -230,3 +250,4 @@ volumes:
   sites:
   logs:
   db-data:
+  db-data-2:
