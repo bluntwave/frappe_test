@@ -30,8 +30,9 @@ jobs:
           bluntwaves/androisprint          
         # generate Docker tags based on the following events/attributes
         tags: |
+          type=sha
           type=ref,event=branch
-          type=semver,pattern={{major}}.{{minor}}
+          type=match,pattern=\d.\d.\d,group=0
 
     
     - name: Build and push the Docker image
