@@ -55,8 +55,11 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_PASS }}
     
-    - name: Switch docker context
+    - name: Connect to docker context
       run: docker context create ssh-androidsprint --docker "host=ssh://bluntwave@dev.androidsprint.ru:4242"
 
+    - name: Switch context
+      run: docker context use ssh-androidsprint
+    
     - name: Docker ps
       run: docker ps
