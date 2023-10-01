@@ -103,7 +103,7 @@ RUN if [ -n "${APPS_JSON_BASE64}" ]; then \
 
 USER frappe
 
-ARG FRAPPE_BRANCH=main
+ARG FRAPPE_BRANCH=rating-removing
 ARG FRAPPE_PATH=https://github.com/bluntwave/frappe_test
 RUN export APP_INSTALL_ARGS="" && \
   if [ -n "${APPS_JSON_BASE64}" ]; then \
