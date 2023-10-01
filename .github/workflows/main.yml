@@ -41,3 +41,15 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: 
+
+    - name: Switch docker context
+      run: docker context create ssh-androidsprint --docker "host=ssh:bluntwave:dev.androidsprint.ru:4242"
