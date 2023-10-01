@@ -57,3 +57,6 @@ jobs:
     
     - name: Switch docker context
       run: docker context create ssh-androidsprint --docker "host=ssh://bluntwave@dev.androidsprint.ru:4242"
+
+    - name: Docker ps
+      run: docker context ps
