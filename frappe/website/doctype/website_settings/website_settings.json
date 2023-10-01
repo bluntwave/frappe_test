@@ -54,7 +54,6 @@
   "footer_logo",
   "column_break_37",
   "address",
-  "footer_powered",
   "custom_footer_section",
   "footer_template",
   "footer_template_values",
@@ -415,12 +414,6 @@
    "fieldname": "auto_account_deletion",
    "fieldtype": "Int",
    "label": "Auto Account Deletion within (Hours)"
-  },
-  {
-   "fieldname": "footer_powered",
-   "fieldtype": "Small Text",
-   "label": "Footer \"Powered By\"",
-   "max_height": "2rem"
   },
   {
    "fieldname": "splash_image",

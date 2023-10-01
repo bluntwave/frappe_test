@@ -39,7 +39,6 @@ class WebsiteSettings(Document):
 		favicon: DF.Attach | None
 		footer_items: DF.Table[TopBarItem]
 		footer_logo: DF.AttachImage | None
-		footer_powered: DF.SmallText | None
 		footer_template: DF.Link | None
 		footer_template_values: DF.Code | None
 		google_analytics_anonymize_ip: DF.Check
@@ -204,7 +203,6 @@ def get_website_settings(context=None):
 		"call_to_action",
 		"call_to_action_url",
 		"show_language_picker",
-		"footer_powered",
 	]:
 		if setting_value := settings.get(k):
 			context[k] = setting_value
